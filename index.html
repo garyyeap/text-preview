@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Text Preview</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css">
+  <style>
+  #preview{
+    width: 200px;
+    height: 200px;
+    background: rgba(91,47,186,.2);
+    text-align: center;
+    font-family: sans-serif!important;
+    line-height: 22px;
+  }
+  #img-wrap img{
+    border: solid 1px #444;
+  }
+  .input-field input[type=text]:focus {
+     border-bottom: 1px solid #7e57c2;
+     box-shadow: 0 1px 0 0 #7e57c2;
+   }
+  .input-field label, .dropdown-content li>span, .input-field input[type=text]:focus + label{
+     color: #7e57c2;
+   }
+  </style>
+</head>
+<body>
+<div class="container" style="padding-top:10px">
+  <div id="preview"></div>
+  <div class="row">
+    <div class="input-field col s12">
+      <input id="text" type="text" value="Charles is amazing!!!!!">
+      <label for="text">Text</label>
+    </div>
+  </div>
+  <div class="row">
+    <div class="input-field col s2">
+      <input id="width" type="text" value="200">
+      <label for="width">Width</label>
+    </div>
+    <div class="input-field col s2">
+      <input id="height" type="text" value="200">
+      <label for="height">Height</label>
+    </div>
+    <div class="input-field col s2">
+      <input id="bg" type="text" value="rgba(91,47,186,.2)">
+      <label for="bg">Background</label>
+    </div>
+    <div class="input-field col s2">
+      <input id="line-height" type="text" value="22">
+      <label for="line-height">Line height</label>
+    </div>
+    <div class="input-field col s2">
+      <input id="padding" type="text" value="0">
+      <label for="padding">Padding</label>
+    </div>
+    <div class="input-field col s2">
+      <input id="text-spacing" type="text" value="0">
+      <label for="text-spacing">Text Spacing</label>
+    </div>
+  </div>
+  <div class="row">
+      <div class="input-field col s3">
+      <input id="font-size" type="text" value="15">
+      <label for="font-size">Font Size</label>
+    </div>
+    <div class="input-field col s3">
+      <input id="text-rgb" type="text" value="0,0,0">
+      <label for="text-rgb">Text RGB(r,g,b)</label>
+    </div>
+    <div class="input-field col s3">
+      <input id="text-shadow" type="text" value="0 0 0">
+      <label for="text-shadow">Text Shadow(x y blur)</label>
+    </div>
+    <div class="input-field col s3">
+      <select id="font-weight">
+        <option value="lighter">Lighter</option>
+        <option value="normal">Normal</option>
+        <option value="bold">Bold</option>
+        <option value="bolder">Bolder</option>
+      </select>
+      <label for="font-weight">Font Weight</label>
+    </div>
+  </div>
+  <div class="row" style="text-align:right">
+    <a class="waves-effect waves-light deep-purple lighten-1 btn" id="export">Export</a>
+  </div>
+   <div id="modal" class="modal">
+    <div class="modal-content">
+      <h4>Right click to save the image</h4>
+      <div id="img-wrap">
+        <img src="" alt="" id="preview-export">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Done</a>
+    </div>
+  </div>
+</div>
+<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/js/materialize.min.js"></script>
+<script src="html2canvas.js"></script>
+<script>
+  $(function(){
+
+    var $preview = $('#preview');
+    var inputChangeEvents = 'propertychange change click keyup input paste';
+
+    $('select').material_select();
+    $preview.html($('#text').val());
+
+    $('#width').bind(inputChangeEvents, function (e){
+      e.preventDefault();
+      $preview.width($(this).val());
+    });
+
+    $('#height').bind(inputChangeEvents, function (e){
+      e.preventDefault();
+      $preview.height($(this).val());
+    });
+
+    $('#font-size').bind(inputChangeEvents, function (e){
+      e.preventDefault();
+      $preview.css('font-size', $(this).val() + 'px');
+    });
+
+    $('#line-height').bind(inputChangeEvents, function (e){
+      e.preventDefault();
+      $preview.css('line-height', $(this).val() + 'px');
+    });
+
+    $('#font-weight').bind(inputChangeEvents, function (e){
+      e.preventDefault();
+      $preview.css('font-weight', $(this).val());
+    });
+
+    $('#padding').bind(inputChangeEvents, function (e){
+      e.preventDefault();
+      $preview.css('padding', $(this).val());
+    });
+
+    $('#bg').bind(inputChangeEvents, function (e){
+      e.preventDefault();
+      $preview.css('background', $(this).val());
+    });
+
+    $('#text-shadow').bind(inputChangeEvents, function (e){
+      e.preventDefault();
+      $preview.css('text-shadow', $(this).val().split(' ').map(function (val){return val + 'px' }).join(' ') + '#000');
+    });
+
+    $('#text-rgb').bind(inputChangeEvents, function (e){
+      e.preventDefault();
+      $preview.css('color', 'rgb(' + $(this).val() + ')');
+    });
+
+    $('#text-spacing').bind(inputChangeEvents, function (e){
+      e.preventDefault();
+      $preview.css('letter-spacing', $(this).val() + 'px');
+    });
+
+    $('#text').bind(inputChangeEvents, function (e){
+      $preview.html($(this).val().replace(/\\n/g, '<br>'));
+    });
+
+    $('#export').click(function (e){
+      e.preventDefault();
+      var $preview = $('#preview').clone();
+      $preview.css('background', 'transparent').appendTo('body');
+
+      html2canvas($preview.get(0), {
+        onrendered: function(canvas) {
+          $('#preview-export').attr('src', canvas.toDataURL());
+          $('#modal').openModal();
+          $preview.remove();
+        }
+      });
+    })
+  });
+</script>
+</body>
+</html>
